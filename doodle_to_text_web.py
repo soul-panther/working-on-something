@@ -6,35 +6,26 @@ import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 from PIL import Image
 import google.generativeai as genai
-from gtts import gTTS
-import tempfile
+from gtts import gTTS  # NEW
+import tempfile        # NEW
 
-# ---------------- CONFIG ----------------
+# Configure Gemini with secret key
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 st.set_page_config(page_title="AI Doodle-to-Text", page_icon="🎨", layout="wide")
+st.title("🎨 AI Doodle-to-Text for Children")
+st.write("Draw on the canvas → Gemini will describe it simply → Hear it read aloud ✨")
 
-# Title Section
-st.markdown(
-    """
-    <h1 style="text-align: center;">AI Doodle-to-Text for Children</h1>
-    <p style="text-align: center; color: gray;">
-        Draw a doodle → AI will describe it simply → Hear it read aloud
-    </p>
-    <hr>
-    """,
-    unsafe_allow_html=True
-)
-
-# ---------------- SIDEBAR ----------------
-st.sidebar.header("Drawing Controls")
+# Sidebar controls
+st.sidebar.header("🖌️ Drawing Controls")
 stroke_width = st.sidebar.slider("Pen Size", 2, 25, 6)
 stroke_color = st.sidebar.color_picker("Pen Color", "#000000")
 bg_color = st.sidebar.color_picker("Background Color", "#FFFFFF")
 realtime_update = st.sidebar.checkbox("Update in realtime", True)
 
-st.sidebar.header("Output Language")
+# Language selector
+st.sidebar.header("🌍 Output Language")
 language = st.sidebar.selectbox(
     "Choose output language:",
     ["English", "Hindi", "Spanish", "French", "German", "Chinese", "Japanese", "Arabic"]
@@ -52,25 +43,21 @@ lang_codes = {
     "Arabic": "ar",
 }
 
-# ---------------- CANVAS (centered) ----------------
-st.markdown("<h3 style='text-align: center;'>Draw Your Doodle</h3>", unsafe_allow_html=True)
+# Draw canvas
+canvas_result = st_canvas(
+    fill_color="rgba(255, 255, 255, 1)",
+    stroke_width=stroke_width,
+    stroke_color=stroke_color,
+    background_color=bg_color,
+    width=600,
+    height=500,
+    drawing_mode="freedraw",
+    key="canvas",
+    update_streamlit=realtime_update,
+)
 
-col1, col2, col3 = st.columns([1, 2, 1])  # center align
-with col2:
-    canvas_result = st_canvas(
-        fill_color="rgba(255, 255, 255, 1)",
-        stroke_width=stroke_width,
-        stroke_color=stroke_color,
-        background_color=bg_color,
-        width=600,
-        height=500,
-        drawing_mode="freedraw",
-        key="canvas",
-        update_streamlit=realtime_update,
-    )
-
-# ---------------- PROCESS ----------------
-if st.button("Generate Interpretation"):
+# Process doodle
+if st.button("✨ Interpret with Gemini"):
     if canvas_result.image_data is not None:
         # Convert NumPy array → Image
         img = Image.fromarray(canvas_result.image_data.astype("uint8")).convert("RGB")
@@ -84,8 +71,8 @@ if st.button("Generate Interpretation"):
         # Prompt for Gemini
         prompt = (
             f"You are helping a dyslexic child. "
-            f"Look at the doodle and describe it simply in {language}. "
-            f"Then make a short cheerful story idea (1–2 sentences) also in {language}."
+            f"Look at the doodle and describe it simply in **{language}**. "
+            f"Then make a short cheerful story idea (1–2 sentences) also in **{language}**."
         )
 
         try:
@@ -97,11 +84,11 @@ if st.button("Generate Interpretation"):
             ])
             text_output = response.text.strip()
 
-            st.markdown("<h3>Interpretation</h3>", unsafe_allow_html=True)
-            st.info(text_output)
+            st.subheader(f"📝 Gemini’s Interpretation ({language})")
+            st.success(text_output)
 
-            # Text-to-Speech
-            st.markdown("<h3>Listen</h3>", unsafe_allow_html=True)
+            # 🔊 Text-to-Speech
+            st.subheader("🔊 Listen")
             try:
                 tts = gTTS(text=text_output, lang=lang_codes.get(language, "en"))
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
