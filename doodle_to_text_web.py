@@ -16,36 +16,27 @@ model = genai.GenerativeModel("gemini-1.5-flash")
 # 🎨 Streamlit page setup
 st.set_page_config(page_title="AI Doodle-to-Text", page_icon="🎨", layout="wide")
 
-# 🌟 Custom CSS for centering + styling (all text white now)
+# 🌟 Custom CSS for centering + styling
 st.markdown(
     """
     <style>
-    /* Center container */
     .block-container {
         max-width: 900px;
         margin: auto;
         text-align: center;
     }
-
-    /* Title */
     h1 {
         text-align: center;
         color: white !important;
         font-size: 2.5rem;
         margin-bottom: 0.5rem;
     }
-
-    /* Force all Streamlit text to white */
     html, body, [class*="css"] {
         color: white !important;
     }
-
-    /* Subtitles */
     h2, h3, h4, .stMarkdown, .stSelectbox label, .stSlider label {
         color: white !important;
     }
-
-    /* Button styling */
     div.stButton > button {
         background: linear-gradient(90deg, #4A90E2, #50E3C2);
         color: white;
@@ -61,14 +52,10 @@ st.markdown(
         transform: scale(1.05);
         background: linear-gradient(90deg, #50E3C2, #4A90E2);
     }
-
-    /* Center audio */
     audio {
         margin: 10px auto;
         display: block;
     }
-
-    /* Canvas toolbar icons (download, undo, redo, delete) → white */
     button svg, .canvas-container svg {
         filter: brightness(5) !important;
         fill: white !important;
@@ -80,7 +67,7 @@ st.markdown(
 
 # 🏷️ Title & description
 st.title("🎨 AI Doodle-to-Text for Children")
-st.write("✨ Draw → Gemini describes → Listen to the story aloud!")
+st.write("✨ Draw or Upload → Gemini describes → Listen to the story aloud!")
 
 # Sidebar controls
 st.sidebar.header("🖌️ Drawing Controls")
@@ -107,23 +94,36 @@ lang_codes = {
     "Arabic": "ar",
 }
 
-# ✏️ Draw canvas (centered)
-st.markdown("### ✏️ Draw Your Doodle Below")
-col1, col2, col3 = st.columns([1, 3, 1])
-with col2:
-    canvas_result = st_canvas(
-        fill_color="rgba(255, 255, 255, 1)",
-        stroke_width=stroke_width,
-        stroke_color=stroke_color,
-        background_color=bg_color,
-        width=600,
-        height=500,
-        drawing_mode="freedraw",
-        key="canvas",
-        update_streamlit=realtime_update,
-    )
+# ✏️ Option to Draw OR Upload
+st.markdown("### ✏️ Draw Your Doodle or Upload an Image")
+upload_option = st.radio("Choose Input Method:", ["Draw on Canvas", "Upload Image"], horizontal=True)
 
-# 🚀 Interpretation heading (centered & styled)
+img = None  # Final image for processing
+
+if upload_option == "Draw on Canvas":
+    col1, col2, col3 = st.columns([1, 3, 1])
+    with col2:
+        canvas_result = st_canvas(
+            fill_color="rgba(255, 255, 255, 1)",
+            stroke_width=stroke_width,
+            stroke_color=stroke_color,
+            background_color=bg_color,
+            width=600,
+            height=500,
+            drawing_mode="freedraw",
+            key="canvas",
+            update_streamlit=realtime_update,
+        )
+    if canvas_result.image_data is not None:
+        img = Image.fromarray(canvas_result.image_data.astype("uint8")).convert("RGB")
+
+else:  # Upload option
+    uploaded_file = st.file_uploader("📂 Upload a drawing (PNG, JPG, JPEG)", type=["png", "jpg", "jpeg"])
+    if uploaded_file is not None:
+        img = Image.open(uploaded_file).convert("RGB")
+        st.image(img, caption="Uploaded Image", use_container_width=True)
+
+# 🚀 Interpretation heading
 st.markdown(
     """
     <h2 style='text-align: center; color: white; margin-top: 40px;'>
@@ -133,16 +133,14 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Center the button under heading
+# Center the button
 colA, colB, colC = st.columns([1, 2, 1])
 with colB:
     interpret = st.button("✨ Interpret with Gemini", use_container_width=True)
 
 # If button clicked
 if interpret:
-    if canvas_result.image_data is not None:
-        img = Image.fromarray(canvas_result.image_data.astype("uint8")).convert("RGB")
-
+    if img is not None:
         buffer = io.BytesIO()
         img.save(buffer, format="PNG")
         img_bytes = buffer.getvalue()
@@ -179,4 +177,4 @@ if interpret:
         except Exception as e:
             st.error(f"Gemini Error: {e}")
     else:
-        st.warning("Please draw something first!")
+        st.warning("Please draw something or upload an image first!")
