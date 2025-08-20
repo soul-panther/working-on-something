@@ -73,6 +73,7 @@ if st.button("✨ Interpret with Gemini"):
             f"You are helping a dyslexic child. "
             f"Look at the doodle and describe it simply in **{language}**. "
             f"Then make a short cheerful story idea (1–2 sentences) also in **{language}**."
+            f"⚠️ Important: ONLY reply in {language}, do not translate or repeat in English."
         )
 
         try:
@@ -91,13 +92,25 @@ if st.button("✨ Interpret with Gemini"):
             st.subheader("🔊 Listen")
             try:
                 tts = gTTS(text=text_output, lang=lang_codes.get(language, "en"))
-                with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
-                    tts.save(tmp.name)
-                    st.audio(tmp.name, format="audio/mp3")
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
+                tts.save(tmp.name)
+                audio_file = open(tmp.name, "rb").read()
+                audio_base64 = base64.b64encode(audio_file).decode("utf-8")
+
+            # Use autoplay audio player
+            audio_html = f"""
+            <audio autoplay controls>
+                <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
+            </audio>
+            """
+                st.markdown(audio_html, unsafe_allow_html=True)
+
             except Exception as e:
                 st.error(f"TTS Error: {e}")
+
 
         except Exception as e:
             st.error(f"Gemini Error: {e}")
     else:
         st.warning("Please draw something first!")
+
