@@ -1,42 +1,49 @@
 # doodle_to_text_web.py
 import streamlit as st
+from streamlit_drawable_canvas import st_canvas
 from PIL import Image
 import google.generativeai as genai
 import base64
+import io
 
-# 🔑 Your Gemini API key
-API_KEY = "AIzaSyDeI4pQxe7puD1Ron2Vmo-5iRVblAeck48"
-
-# Configure Gemini
+# 🔑 Gemini API Key
+API_KEY = "YOUR_API_KEY_HERE"
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 st.set_page_config(page_title="AI Doodle-to-Text", page_icon="🎨")
 st.title("🎨 AI Doodle-to-Text for Children")
-st.write("Upload your doodle → Gemini will describe it simply → Get a cheerful story idea ✨")
+st.write("Draw below → Gemini will describe it → Get a cheerful story idea ✨")
 
-# Upload doodle
-uploaded_file = st.file_uploader("Upload your doodle (PNG/JPG)", type=["png","jpg","jpeg"])
+# Canvas settings
+canvas_result = st_canvas(
+    fill_color="rgba(255, 255, 255, 1)",  # white background
+    stroke_width=6,
+    stroke_color="black",
+    background_color="white",
+    width=400,
+    height=400,
+    drawing_mode="freedraw",
+    key="canvas",
+)
 
-if uploaded_file:
-    # Show doodle
-    img = Image.open(uploaded_file).convert("RGB")
-    st.image(img, caption="Your Doodle", use_column_width=True)
+if st.button("✨ Interpret with Gemini"):
+    if canvas_result.image_data is not None:
+        # Convert NumPy image array → PNG
+        img = Image.fromarray((canvas_result.image_data).astype("uint8")).convert("RGB")
 
-    # Convert to base64 for Gemini
-    with open("temp.png", "wb") as f:
-        f.write(uploaded_file.read())
-    with open("temp.png", "rb") as f:
-        img_bytes = f.read()
-    img_b64 = base64.b64encode(img_bytes).decode("utf-8")
+        # Save to bytes
+        buffer = io.BytesIO()
+        img.save(buffer, format="PNG")
+        img_bytes = buffer.getvalue()
+        img_b64 = base64.b64encode(img_bytes).decode("utf-8")
 
-    prompt = (
-        "You are helping a dyslexic child. "
-        "Look at the doodle and describe it in simple words. "
-        "Then make a short cheerful story idea in 1–2 sentences."
-    )
+        prompt = (
+            "You are helping a dyslexic child. "
+            "Look at the doodle and describe it simply. "
+            "Then make a short cheerful story idea in 1–2 sentences."
+        )
 
-    if st.button("✨ Interpret with Gemini"):
         try:
             response = model.generate_content([
                 {"role": "user", "parts": [
@@ -48,3 +55,6 @@ if uploaded_file:
             st.success(response.text.strip())
         except Exception as e:
             st.error(f"Error: {e}")
+    else:
+        st.warning("Please draw something first!")
+
