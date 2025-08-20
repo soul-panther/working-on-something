@@ -6,16 +6,71 @@ import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 from PIL import Image
 import google.generativeai as genai
-from gtts import gTTS  # NEW
-import tempfile        # NEW
+from gtts import gTTS
+import tempfile
 
-# Configure Gemini with secret key
+# 🔑 Configure Gemini
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 model = genai.GenerativeModel("gemini-1.5-flash")
 
+# 🎨 Streamlit page setup
 st.set_page_config(page_title="AI Doodle-to-Text", page_icon="🎨", layout="wide")
+
+# 🌟 Custom CSS for centering + styling
+st.markdown(
+    """
+    <style>
+    /* Center everything */
+    .block-container {
+        max-width: 900px;
+        margin: auto;
+        text-align: center;
+    }
+
+    /* Style title */
+    h1 {
+        text-align: center;
+        color: #4A90E2;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Subtitle */
+    .stMarkdown {
+        font-size: 1.1rem;
+        color: #444;
+    }
+
+    /* Button styling */
+    div.stButton > button {
+        background: linear-gradient(90deg, #4A90E2, #50E3C2);
+        color: white;
+        border-radius: 12px;
+        padding: 0.6rem 1.2rem;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    div.stButton > button:hover {
+        transform: scale(1.05);
+        background: linear-gradient(90deg, #50E3C2, #4A90E2);
+    }
+
+    /* Center audio player */
+    audio {
+        margin: 10px auto;
+        display: block;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# 🏷️ Title & description
 st.title("🎨 AI Doodle-to-Text for Children")
-st.write("Draw on the canvas → Gemini will describe it simply → Hear it read aloud ✨")
+st.write("✨ Draw → Gemini describes → Listen to the story aloud!")
 
 # Sidebar controls
 st.sidebar.header("🖌️ Drawing Controls")
@@ -28,10 +83,9 @@ realtime_update = st.sidebar.checkbox("Update in realtime", True)
 st.sidebar.header("🌍 Output Language")
 language = st.sidebar.selectbox(
     "Choose output language:",
-    ["English", "Hindi", "Spanish", "French", "German", "Chinese", "Japanese", "Arabic"]
+    ["English", "Hindi", "Spanish", "French", "German", "Chinese", "Japanese", "Arabic"],
 )
 
-# Map dropdown to gTTS language codes
 lang_codes = {
     "English": "en",
     "Hindi": "hi",
@@ -43,32 +97,33 @@ lang_codes = {
     "Arabic": "ar",
 }
 
-# Draw canvas
-canvas_result = st_canvas(
-    fill_color="rgba(255, 255, 255, 1)",
-    stroke_width=stroke_width,
-    stroke_color=stroke_color,
-    background_color=bg_color,
-    width=600,
-    height=500,
-    drawing_mode="freedraw",
-    key="canvas",
-    update_streamlit=realtime_update,
-)
+# Center canvas
+st.markdown("### ✏️ Draw Your Doodle Below")
+col1, col2, col3 = st.columns([1, 3, 1])
+with col2:
+    canvas_result = st_canvas(
+        fill_color="rgba(255, 255, 255, 1)",
+        stroke_width=stroke_width,
+        stroke_color=stroke_color,
+        background_color=bg_color,
+        width=600,
+        height=500,
+        drawing_mode="freedraw",
+        key="canvas",
+        update_streamlit=realtime_update,
+    )
 
-# Process doodle
+# ✨ Interpret button
+st.markdown("## 🚀 Generate Interpretation")
 if st.button("✨ Interpret with Gemini"):
     if canvas_result.image_data is not None:
-        # Convert NumPy array → Image
         img = Image.fromarray(canvas_result.image_data.astype("uint8")).convert("RGB")
 
-        # Convert to base64
         buffer = io.BytesIO()
         img.save(buffer, format="PNG")
         img_bytes = buffer.getvalue()
         img_b64 = base64.b64encode(img_bytes).decode("utf-8")
 
-        # Prompt for Gemini
         prompt = (
             f"You are helping a dyslexic child. "
             f"Look at the doodle and describe it simply in **{language}**. "
