@@ -20,6 +20,16 @@ st.set_page_config(page_title="AI Doodle-to-Text", page_icon="🎨", layout="wid
 st.markdown(
     """
     <style>
+    /* 🎨 Fix dark canvas toolbar icons */
+    .canvas-container svg {
+        filter: drop-shadow(0px 0px 2px #00e5ff) brightness(2);
+        fill: url(#cyan-gradient);
+    }
+    /* Add a cyan gradient definition */
+    svg defs {
+        position: absolute;
+    }
+    
     /* Center container */
     .block-container {
         max-width: 900px;
@@ -175,3 +185,4 @@ if interpret:
             st.error(f"Gemini Error: {e}")
     else:
         st.warning("Please draw something first!")
+
