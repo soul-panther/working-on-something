@@ -1,87 +1,103 @@
+# doodle_to_text_web.py
+import os
+import io
+import base64
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
+from PIL import Image
 import google.generativeai as genai
-from gtts import gTTS
-import tempfile
-import base64
+from gtts import gTTS  # NEW
+import tempfile        # NEW
 
-# ---------------- CONFIG ----------------
-st.set_page_config(page_title="Doodle to Story", layout="wide")
+# Configure Gemini with secret key
+genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+model = genai.GenerativeModel("gemini-1.5-flash")
 
-st.title("🎨 Doodle → 📖 Story + 🔊 Voice")
+st.set_page_config(page_title="AI Doodle-to-Text", page_icon="🎨", layout="wide")
+st.title("🎨 AI Doodle-to-Text for Children")
+st.write("Draw on the canvas → Gemini will describe it simply → Hear it read aloud ✨")
 
-# Configure Gemini API
-import os
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+# Sidebar controls
+st.sidebar.header("🖌️ Drawing Controls")
+stroke_width = st.sidebar.slider("Pen Size", 2, 25, 6)
+stroke_color = st.sidebar.color_picker("Pen Color", "#000000")
+bg_color = st.sidebar.color_picker("Background Color", "#FFFFFF")
+realtime_update = st.sidebar.checkbox("Update in realtime", True)
 
-# Language options
+# Language selector
+st.sidebar.header("🌍 Output Language")
+language = st.sidebar.selectbox(
+    "Choose output language:",
+    ["English", "Hindi", "Spanish", "French", "German", "Chinese", "Japanese", "Arabic"]
+)
+
+# Map dropdown to gTTS language codes
 lang_codes = {
     "English": "en",
     "Hindi": "hi",
     "Spanish": "es",
     "French": "fr",
     "German": "de",
+    "Chinese": "zh-cn",
+    "Japanese": "ja",
+    "Arabic": "ar",
 }
-language = st.selectbox("🌐 Select Language", list(lang_codes.keys()))
 
-# ---------------- CANVAS ----------------
-st.subheader("Draw your doodle here 🖌️")
+# Draw canvas
 canvas_result = st_canvas(
-    fill_color="rgba(255, 255, 255, 0.3)",
-    stroke_width=6,
-    stroke_color=st.color_picker("✏️ Pick a color", "#000000"),
-    background_color="#FFFFFF",
-    height=400,   # bigger canvas
+    fill_color="rgba(255, 255, 255, 1)",
+    stroke_width=stroke_width,
+    stroke_color=stroke_color,
+    background_color=bg_color,
     width=600,
+    height=500,
     drawing_mode="freedraw",
     key="canvas",
+    update_streamlit=realtime_update,
 )
 
-# ---------------- PROCESS ----------------
-if st.button("✨ Generate Story"):
+# Process doodle
+if st.button("✨ Interpret with Gemini"):
     if canvas_result.image_data is not None:
-        with st.spinner("Thinking... 🧠"):
+        # Convert NumPy array → Image
+        img = Image.fromarray(canvas_result.image_data.astype("uint8")).convert("RGB")
+
+        # Convert to base64
+        buffer = io.BytesIO()
+        img.save(buffer, format="PNG")
+        img_bytes = buffer.getvalue()
+        img_b64 = base64.b64encode(img_bytes).decode("utf-8")
+
+        # Prompt for Gemini
+        prompt = (
+            f"You are helping a dyslexic child. "
+            f"Look at the doodle and describe it simply in **{language}**. "
+            f"Then make a short cheerful story idea (1–2 sentences) also in **{language}**."
+        )
+
+        try:
+            response = model.generate_content([
+                {"role": "user", "parts": [
+                    {"text": prompt},
+                    {"inline_data": {"mime_type": "image/png", "data": img_b64}}
+                ]}
+            ])
+            text_output = response.text.strip()
+
+            st.subheader(f"📝 Gemini’s Interpretation ({language})")
+            st.success(text_output)
+
+            # 🔊 Text-to-Speech
+            st.subheader("🔊 Listen")
             try:
-                # Convert doodle to story
-                model = genai.GenerativeModel("gemini-1.5-flash")
-                prompt = (
-                    f"You are helping a dyslexic child. "
-                    f"Look at the doodle and describe it simply in {language}. "
-                    f"Then make a short cheerful story idea (1–2 sentences) in {language}. "
-                    f"⚠️ Important: ONLY reply in {language}, do not translate or repeat in English."
-                )
-
-                img = canvas_result.image_data
-                response = model.generate_content([prompt, img])
-                text_output = response.text
-
-                st.subheader("📖 Story")
-                st.success(text_output)
-
-                # ---------------- TTS ----------------
-                st.subheader("🔊 Listen")
-                try:
-                    tts = gTTS(text=text_output, lang=lang_codes.get(language, "en"))
-                    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
-                        tts.save(tmp.name)
-                        audio_file = open(tmp.name, "rb").read()
-                        audio_base64 = base64.b64encode(audio_file).decode("utf-8")
-
-                        # Autoplay audio
-                        audio_html = f"""
-                        <audio autoplay controls>
-                            <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
-                        </audio>
-                        """
-                        st.markdown(audio_html, unsafe_allow_html=True)
-
-                        # Download button
-                        st.download_button("💾 Download Story Audio", audio_file, "story.mp3")
-
-                except Exception as e:
-                    st.error(f"TTS Error: {e}")
-
+                tts = gTTS(text=text_output, lang=lang_codes.get(language, "en"))
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
+                    tts.save(tmp.name)
+                    st.audio(tmp.name, format="audio/mp3")
             except Exception as e:
-                st.error(f"Error: {e}")
+                st.error(f"TTS Error: {e}")
+
+        except Exception as e:
+            st.error(f"Gemini Error: {e}")
     else:
-        st.warning("⚠️ Please draw something first!")
+        st.warning("Please draw something first!")
