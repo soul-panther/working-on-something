@@ -83,6 +83,21 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# Inject a cyan gradient for toolbar icons
+st.markdown(
+    """
+    <svg width="0" height="0">
+      <defs>
+        <linearGradient id="cyan-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#00e5ff" />
+          <stop offset="100%" stop-color="#00c6ff" />
+        </linearGradient>
+      </defs>
+    </svg>
+    """,
+    unsafe_allow_html=True,
+)
+
 # 🏷️ Title & description
 st.title("🎨 AI Doodle-to-Text for Children")
 st.write("✨ Draw → Gemini describes → Listen to the story aloud!")
@@ -185,4 +200,5 @@ if interpret:
             st.error(f"Gemini Error: {e}")
     else:
         st.warning("Please draw something first!")
+
 
