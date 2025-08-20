@@ -22,13 +22,20 @@ stroke_color = st.sidebar.color_picker("Pen Color", "#000000")
 bg_color = st.sidebar.color_picker("Background Color", "#FFFFFF")
 realtime_update = st.sidebar.checkbox("Update in realtime", True)
 
+# Language selector
+st.sidebar.header("🌍 Output Language")
+language = st.sidebar.selectbox(
+    "Choose output language:",
+    ["English", "Hindi", "Spanish", "French", "German", "Chinese", "Japanese", "Arabic"]
+)
+
 # Draw canvas
 canvas_result = st_canvas(
     fill_color="rgba(255, 255, 255, 1)",
     stroke_width=stroke_width,
     stroke_color=stroke_color,
     background_color=bg_color,
-    width=600,   # bigger canvas
+    width=600,
     height=500,
     drawing_mode="freedraw",
     key="canvas",
@@ -49,9 +56,9 @@ if st.button("✨ Interpret with Gemini"):
 
         # Prompt for Gemini
         prompt = (
-            "You are helping a dyslexic child. "
-            "Look at the doodle and describe it simply. "
-            "Then make a short cheerful story idea in 1–2 sentences."
+            f"You are helping a dyslexic child. "
+            f"Look at the doodle and describe it simply in **{language}**. "
+            f"Then make a short cheerful story idea (1–2 sentences) also in **{language}**."
         )
 
         try:
@@ -61,7 +68,7 @@ if st.button("✨ Interpret with Gemini"):
                     {"inline_data": {"mime_type": "image/png", "data": img_b64}}
                 ]}
             ])
-            st.subheader("📝 Gemini’s Interpretation")
+            st.subheader(f"📝 Gemini’s Interpretation ({language})")
             st.success(response.text.strip())
         except Exception as e:
             st.error(f"Error: {e}")
