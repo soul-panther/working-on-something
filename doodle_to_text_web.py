@@ -7,71 +7,176 @@ from streamlit_drawable_canvas import st_canvas
 from PIL import Image
 import google.generativeai as genai
 from gtts import gTTS
+import tempfile
 
-# --- Page Config ---
-st.set_page_config(page_title="AI Doodle-to-Text", page_icon="🎨", layout="centered")
+# 🔑 Configure Gemini
+genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+model = genai.GenerativeModel("gemini-1.5-flash")
 
-# --- Inject CSS ---
+# 🎨 Streamlit page setup
+st.set_page_config(page_title="AI Doodle-to-Text", page_icon="🎨", layout="wide")
+
+# 🌟 Custom CSS for centering + styling (all text white now)
 st.markdown(
     """
     <style>
-    /* Make all Streamlit text white */
-    .stMarkdown, .stText, .stButton>button, .stRadio label, .stSelectbox label {
+    /* Center container */
+    .block-container {
+        max-width: 900px;
+        margin: auto;
+        text-align: center;
+    }
+
+    /* Title */
+    h1 {
+        text-align: center;
+        color: white !important;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Force all Streamlit text to white */
+    html, body, [class*="css"] {
         color: white !important;
     }
 
-    /* Fix toolbar buttons (undo, redo, delete, save) */
-    button[kind="canvas_toolbar"] svg {
-        fill: white !important;   /* Change to cyan: linear-gradient not supported on svg fill */
+    /* Subtitles */
+    h2, h3, h4, .stMarkdown, .stSelectbox label, .stSlider label {
+        color: white !important;
     }
 
-    /* Optional: hover effect with cyan tint */
-    button[kind="canvas_toolbar"]:hover svg {
-        fill: cyan !important;
+    /* Button styling */
+    div.stButton > button {
+        background: linear-gradient(90deg, #4A90E2, #50E3C2);
+        color: white;
+        border-radius: 12px;
+        padding: 0.6rem 1.2rem;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    div.stButton > button:hover {
+        transform: scale(1.05);
+        background: linear-gradient(90deg, #50E3C2, #4A90E2);
+    }
+
+    /* Center audio */
+    audio {
+        margin: 10px auto;
+        display: block;
+    }
+
+    /* Canvas toolbar icons (download, undo, redo, delete) → white */
+    button svg, .canvas-container svg {
+        filter: brightness(5) !important;
+        fill: white !important;
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# --- Title ---
+# 🏷️ Title & description
+st.title("🎨 AI Doodle-to-Text for Children")
+st.write("✨ Draw → Gemini describes → Listen to the story aloud!")
+
+# Sidebar controls
+st.sidebar.header("🖌️ Drawing Controls")
+stroke_width = st.sidebar.slider("Pen Size", 2, 25, 6)
+stroke_color = st.sidebar.color_picker("Pen Color", "#000000")
+bg_color = st.sidebar.color_picker("Background Color", "#FFFFFF")
+realtime_update = st.sidebar.checkbox("Update in realtime", True)
+
+# Language selector
+st.sidebar.header("🌍 Output Language")
+language = st.sidebar.selectbox(
+    "Choose output language:",
+    ["English", "Hindi", "Spanish", "French", "German", "Chinese", "Japanese", "Arabic"],
+)
+
+lang_codes = {
+    "English": "en",
+    "Hindi": "hi",
+    "Spanish": "es",
+    "French": "fr",
+    "German": "de",
+    "Chinese": "zh-cn",
+    "Japanese": "ja",
+    "Arabic": "ar",
+}
+
+# ✏️ Draw canvas (centered)
+st.markdown("### ✏️ Draw Your Doodle Below")
+col1, col2, col3 = st.columns([1, 3, 1])
+with col2:
+    canvas_result = st_canvas(
+        fill_color="rgba(255, 255, 255, 1)",
+        stroke_width=stroke_width,
+        stroke_color=stroke_color,
+        background_color=bg_color,
+        width=600,
+        height=500,
+        drawing_mode="freedraw",
+        key="canvas",
+        update_streamlit=realtime_update,
+    )
+
+# 🚀 Interpretation heading (centered & styled)
 st.markdown(
-    "<h1 style='text-align:center;'>🎨 AI Doodle-to-Text for Children</h1>",
+    """
+    <h2 style='text-align: center; color: white; margin-top: 40px;'>
+        🚀 Generate Interpretation
+    </h2>
+    """,
     unsafe_allow_html=True,
 )
-st.markdown("<p style='text-align:center;'>✨ Draw → Gemini describes → Listen aloud!</p>", unsafe_allow_html=True)
 
-# --- Drawing Canvas ---
-st.subheader("✏️ Draw Your Doodle Below")
-canvas_result = st_canvas(
-    fill_color="rgba(255, 165, 0, 0.3)",
-    stroke_width=5,
-    stroke_color="#000000",
-    background_color="#FFFFFF",
-    update_streamlit=True,
-    height=400,
-    width=400,
-    drawing_mode="freedraw",
-    key="canvas",
-)
+# Center the button under heading
+colA, colB, colC = st.columns([1, 2, 1])
+with colB:
+    interpret = st.button("✨ Interpret with Gemini", use_container_width=True)
 
-# --- Process Button ---
-if st.button("Generate Story from Doodle 🎙️"):
+# If button clicked
+if interpret:
     if canvas_result.image_data is not None:
-        img = Image.fromarray(canvas_result.image_data.astype("uint8"))
-        buffered = io.BytesIO()
-        img.save(buffered, format="PNG")
+        img = Image.fromarray(canvas_result.image_data.astype("uint8")).convert("RGB")
 
-        # Send to Gemini (pseudo - replace with your API)
-        description = "A child-like doodle detected. Imagine a fun story about it!"
+        buffer = io.BytesIO()
+        img.save(buffer, format="PNG")
+        img_bytes = buffer.getvalue()
+        img_b64 = base64.b64encode(img_bytes).decode("utf-8")
 
-        # TTS
-        tts = gTTS(description)
-        tts.save("story.mp3")
-        audio_file = open("story.mp3", "rb")
-        audio_bytes = audio_file.read()
-        st.audio(audio_bytes, format="audio/mp3")
+        prompt = (
+            f"You are helping a dyslexic child. "
+            f"Look at the doodle and describe it simply in **{language}**. "
+            f"Then make a short cheerful story idea (1–2 sentences) also in **{language}**."
+        )
 
-        st.success("✨ Story generated and played aloud!")
+        try:
+            response = model.generate_content([
+                {"role": "user", "parts": [
+                    {"text": prompt},
+                    {"inline_data": {"mime_type": "image/png", "data": img_b64}}
+                ]}
+            ])
+            text_output = response.text.strip()
+
+            st.subheader(f"📝 Gemini’s Interpretation ({language})")
+            st.success(text_output)
+
+            # 🔊 Text-to-Speech
+            st.subheader("🔊 Listen")
+            try:
+                tts = gTTS(text=text_output, lang=lang_codes.get(language, "en"))
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
+                    tts.save(tmp.name)
+                    st.audio(tmp.name, format="audio/mp3")
+            except Exception as e:
+                st.error(f"TTS Error: {e}")
+
+        except Exception as e:
+            st.error(f"Gemini Error: {e}")
     else:
         st.warning("Please draw something first!")
