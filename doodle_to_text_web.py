@@ -20,14 +20,14 @@ st.set_page_config(page_title="AI Doodle-to-Text", page_icon="🎨", layout="wid
 st.markdown(
     """
     <style>
-    /* Center everything */
+    /* Center container */
     .block-container {
         max-width: 900px;
         margin: auto;
         text-align: center;
     }
 
-    /* Style title */
+    /* Title */
     h1 {
         text-align: center;
         color: #4A90E2;
@@ -58,10 +58,15 @@ st.markdown(
         background: linear-gradient(90deg, #50E3C2, #4A90E2);
     }
 
-    /* Center audio player */
+    /* Center audio */
     audio {
         margin: 10px auto;
         display: block;
+    }
+
+    /* Light pastel background */
+    body {
+        background: linear-gradient(135deg, #f9f9f9, #e6f7ff);
     }
     </style>
     """,
@@ -97,7 +102,7 @@ lang_codes = {
     "Arabic": "ar",
 }
 
-# Center canvas
+# ✏️ Draw canvas (centered)
 st.markdown("### ✏️ Draw Your Doodle Below")
 col1, col2, col3 = st.columns([1, 3, 1])
 with col2:
@@ -113,9 +118,23 @@ with col2:
         update_streamlit=realtime_update,
     )
 
-# ✨ Interpret button
-st.markdown("## 🚀 Generate Interpretation")
-if st.button("✨ Interpret with Gemini"):
+# 🚀 Interpretation heading (centered & styled)
+st.markdown(
+    """
+    <h2 style='text-align: center; color: #4A90E2; margin-top: 40px;'>
+        🚀 Generate Interpretation
+    </h2>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Center the button under heading
+colA, colB, colC = st.columns([1, 2, 1])
+with colB:
+    interpret = st.button("✨ Interpret with Gemini", use_container_width=True)
+
+# If button clicked
+if interpret:
     if canvas_result.image_data is not None:
         img = Image.fromarray(canvas_result.image_data.astype("uint8")).convert("RGB")
 
