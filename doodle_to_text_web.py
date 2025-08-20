@@ -7,8 +7,11 @@ import base64
 import io
 
 # 🔑 Gemini API Key
-API_KEY = "YOUR_API_KEY_HERE"
-genai.configure(api_key=API_KEY)
+import os
+import google.generativeai as genai
+
+genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 st.set_page_config(page_title="AI Doodle-to-Text", page_icon="🎨")
@@ -57,4 +60,5 @@ if st.button("✨ Interpret with Gemini"):
             st.error(f"Error: {e}")
     else:
         st.warning("Please draw something first!")
+
 
