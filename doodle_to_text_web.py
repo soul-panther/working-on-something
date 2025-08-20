@@ -6,6 +6,8 @@ import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 from PIL import Image
 import google.generativeai as genai
+from gtts import gTTS  # NEW
+import tempfile        # NEW
 
 # Configure Gemini with secret key
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
@@ -13,7 +15,7 @@ model = genai.GenerativeModel("gemini-1.5-flash")
 
 st.set_page_config(page_title="AI Doodle-to-Text", page_icon="🎨", layout="wide")
 st.title("🎨 AI Doodle-to-Text for Children")
-st.write("Draw on the canvas → Gemini will describe it simply → Get a cheerful story idea ✨")
+st.write("Draw on the canvas → Gemini will describe it simply → Hear it read aloud ✨")
 
 # Sidebar controls
 st.sidebar.header("🖌️ Drawing Controls")
@@ -28,6 +30,18 @@ language = st.sidebar.selectbox(
     "Choose output language:",
     ["English", "Hindi", "Spanish", "French", "German", "Chinese", "Japanese", "Arabic"]
 )
+
+# Map dropdown to gTTS language codes
+lang_codes = {
+    "English": "en",
+    "Hindi": "hi",
+    "Spanish": "es",
+    "French": "fr",
+    "German": "de",
+    "Chinese": "zh-cn",
+    "Japanese": "ja",
+    "Arabic": "ar",
+}
 
 # Draw canvas
 canvas_result = st_canvas(
@@ -68,9 +82,22 @@ if st.button("✨ Interpret with Gemini"):
                     {"inline_data": {"mime_type": "image/png", "data": img_b64}}
                 ]}
             ])
+            text_output = response.text.strip()
+
             st.subheader(f"📝 Gemini’s Interpretation ({language})")
-            st.success(response.text.strip())
+            st.success(text_output)
+
+            # 🔊 Text-to-Speech
+            st.subheader("🔊 Listen")
+            try:
+                tts = gTTS(text=text_output, lang=lang_codes.get(language, "en"))
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
+                    tts.save(tmp.name)
+                    st.audio(tmp.name, format="audio/mp3")
+            except Exception as e:
+                st.error(f"TTS Error: {e}")
+
         except Exception as e:
-            st.error(f"Error: {e}")
+            st.error(f"Gemini Error: {e}")
     else:
         st.warning("Please draw something first!")
