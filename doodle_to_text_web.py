@@ -16,20 +16,10 @@ model = genai.GenerativeModel("gemini-1.5-flash")
 # 🎨 Streamlit page setup
 st.set_page_config(page_title="AI Doodle-to-Text", page_icon="🎨", layout="wide")
 
-# 🌟 Custom CSS for centering + styling
+# 🌟 Custom CSS for centering + styling (all text white now)
 st.markdown(
     """
     <style>
-    /* 🎨 Fix dark canvas toolbar icons */
-    .canvas-container svg {
-        filter: drop-shadow(0px 0px 2px #00e5ff) brightness(2);
-        fill: url(#cyan-gradient);
-    }
-    /* Add a cyan gradient definition */
-    svg defs {
-        position: absolute;
-    }
-    
     /* Center container */
     .block-container {
         max-width: 900px;
@@ -40,15 +30,19 @@ st.markdown(
     /* Title */
     h1 {
         text-align: center;
-        color: #4A90E2;
+        color: white !important;
         font-size: 2.5rem;
         margin-bottom: 0.5rem;
     }
 
-    /* Subtitle */
-    .stMarkdown {
-        font-size: 1.1rem;
-        color: #444;
+    /* Force all Streamlit text to white */
+    html, body, [class*="css"] {
+        color: white !important;
+    }
+
+    /* Subtitles */
+    h2, h3, h4, .stMarkdown, .stSelectbox label, .stSlider label {
+        color: white !important;
     }
 
     /* Button styling */
@@ -74,26 +68,12 @@ st.markdown(
         display: block;
     }
 
-    /* Light pastel background */
-    body {
-        background: linear-gradient(135deg, #f9f9f9, #e6f7ff);
+    /* Canvas toolbar icons (download, undo, redo, delete) → white */
+    button svg, .canvas-container svg {
+        filter: brightness(5) !important;
+        fill: white !important;
     }
     </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-# Inject a cyan gradient for toolbar icons
-st.markdown(
-    """
-    <svg width="0" height="0">
-      <defs>
-        <linearGradient id="cyan-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#00e5ff" />
-          <stop offset="100%" stop-color="#00c6ff" />
-        </linearGradient>
-      </defs>
-    </svg>
     """,
     unsafe_allow_html=True,
 )
@@ -146,7 +126,7 @@ with col2:
 # 🚀 Interpretation heading (centered & styled)
 st.markdown(
     """
-    <h2 style='text-align: center; color: #4A90E2; margin-top: 40px;'>
+    <h2 style='text-align: center; color: white; margin-top: 40px;'>
         🚀 Generate Interpretation
     </h2>
     """,
@@ -200,5 +180,3 @@ if interpret:
             st.error(f"Gemini Error: {e}")
     else:
         st.warning("Please draw something first!")
-
-
