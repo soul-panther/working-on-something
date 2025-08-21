@@ -68,7 +68,7 @@ st.markdown(
 # 🏷️ Branding Header
 st.markdown(
     """
-    <h1>AI Doodle-to-Text</h1>
+    <h1 style="color: black;">AI Doodle-to-Text</h1>
     <p style='text-align:center; font-size:1.2rem; color:#000000; margin-bottom:30px;'>
         Transform your drawings into simple descriptions and short stories
     </p>
@@ -198,4 +198,5 @@ if interpret:
             st.error(f"Gemini Error: {e}")
     else:
         st.warning("Please draw something or upload an image first!")
+
 
