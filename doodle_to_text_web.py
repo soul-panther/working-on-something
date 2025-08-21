@@ -83,7 +83,7 @@ st.markdown(
     <style>
     /* Make sidebar text black */
     [data-testid="stSidebar"] * {
-        background-color: cyan !important 
+        
         color: black !important;
         fill: black !important;
         stroke: black !important;
@@ -258,6 +258,7 @@ if interpret:
                     st.error(f"TTS error: {e}")
         except Exception as e:
             st.error(f"Gemini error: {e}")
+
 
 
 
