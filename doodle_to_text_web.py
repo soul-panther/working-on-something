@@ -93,11 +93,11 @@ st.markdown(
     [data-testid="stSidebar"] .stSelectbox label,
     [data-testid="stSidebar"] .stSelectbox span {
         color: black !important;
-        background: cyan !important;
+        background: #ADD8E6 !important;
     }
     [data-testid="stSidebar"] .st-b9 {
         color: black !important;
-        background: cyan !important;
+        background: #ADD8E6 !important;
     }
     [data-testid="stSidebar"] input, 
     [data-testid="stSidebar"] select, 
@@ -253,4 +253,5 @@ if interpret:
                     st.error(f"TTS error: {e}")
         except Exception as e:
             st.error(f"Gemini error: {e}")
+
 
