@@ -16,6 +16,15 @@ model = genai.GenerativeModel("gemini-1.5-flash")
 # 🎨 Streamlit page setup
 st.set_page_config(page_title="AI Doodle-to-Text", page_icon="🖌️", layout="wide")
 
+    page_bg_css = """
+    <style>
+    div[data-testid="stAppViewContainer"] {
+        background-color: #ADD8E6; /* Light blue */
+    }
+    </style>
+    """
+    st.markdown(page_bg_css, unsafe_allow_html=True)
+
 # 🌟 Custom CSS for centering + branding
 st.markdown(
     """
@@ -195,3 +204,4 @@ if interpret:
             st.error(f"Gemini Error: {e}")
     else:
         st.warning("Please draw something or upload an image first!")
+
