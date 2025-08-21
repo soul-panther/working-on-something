@@ -20,6 +20,14 @@ st.set_page_config(page_title="AI Doodle-to-Text", page_icon="🎨", layout="wid
 st.markdown(
     """
     <style>
+    .stCanvas {{
+        margin: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: {CANVAS_SIZE}px !important;
+        height: {CANVAS_SIZE}px !important;
+    }}
     .block-container {
         max-width: 900px;
         margin: auto;
@@ -115,6 +123,7 @@ with col_r2:
     )
     
 img = None  # Final image for processing
+CANVAS_SIZE = 600
 
 if upload_option == "Draw on Canvas":
     col1, col2, col3 = st.columns([1, 3, 1])
@@ -124,8 +133,8 @@ if upload_option == "Draw on Canvas":
             stroke_width=stroke_width,
             stroke_color=stroke_color,
             background_color=bg_color,
-            width=600,
-            height=500,
+            width=CANVAS_SIZE,
+            height=CANVAS_SIZE,
             drawing_mode="freedraw",
             key="canvas",
             update_streamlit=realtime_update,
@@ -194,4 +203,5 @@ if interpret:
             st.error(f"Gemini Error: {e}")
     else:
         st.warning("Please draw something or upload an image first!")
+
 
