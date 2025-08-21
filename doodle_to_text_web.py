@@ -95,9 +95,25 @@ lang_codes = {
 }
 
 # ✏️ Option to Draw OR Upload
-st.markdown("### ✏️ Draw Your Doodle or Upload an Image")
-upload_option = st.radio("Choose Input Method:", ["Draw on Canvas", "Upload Image"], horizontal=True)
+st.markdown(
+    """
+    <div style="text-align:center; margin-top:20px;">
+        <h3>✏️ Draw Your Doodle or Upload an Image</h3>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
+# Centered Radio Buttons
+col_r1, col_r2, col_r3 = st.columns([1, 2, 1])
+with col_r2:
+    upload_option = st.radio(
+        "Choose Input Method:",
+        ["Draw on Canvas", "Upload Image"],
+        horizontal=True,
+        label_visibility="collapsed"
+    )
+    
 img = None  # Final image for processing
 
 if upload_option == "Draw on Canvas":
@@ -178,3 +194,4 @@ if interpret:
             st.error(f"Gemini Error: {e}")
     else:
         st.warning("Please draw something or upload an image first!")
+
