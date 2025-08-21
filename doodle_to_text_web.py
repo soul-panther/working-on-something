@@ -84,7 +84,7 @@ st.markdown(
     /* Make sidebar text black */
     [data-testid="stSidebar"] * {
         color: black !important;
-        fill: black !important;
+        
         stroke: black !important;
     }
     /* Make Streamlit selectbox readable */
@@ -253,6 +253,7 @@ if interpret:
                     st.error(f"TTS error: {e}")
         except Exception as e:
             st.error(f"Gemini error: {e}")
+
 
 
 
