@@ -6,7 +6,7 @@ AI Doodle‑to‑Text — Streamlit app (fixed)
 - Persists last image
 - Cleaner UI
 - Toolbar icons styled
-- All text set to cyan
+- All text set to white
 """
 
 from __future__ import annotations
@@ -85,17 +85,17 @@ st.markdown(
         background-color: #00008B;  # Example: light blue
     }
     .block-container{max-width:900px;margin:auto;text-align:center}
-    h1{color:cyan;font-size:2.8rem;margin-bottom:0.2rem}
-    html,body,[class*="css"]{background:#fff;color:cyan}
-    div.stButton > button{background:linear-gradient(90deg,#2563eb,#14b8a6);color:cyan;border-radius:12px;padding:0.6rem 1.2rem;font-size:1.05rem;font-weight:600;border:none}
+    h1{color:white;font-size:2.8rem;margin-bottom:0.2rem}
+    html,body,[class*="css"]{background:#fff;color:white}
+    div.stButton > button{background:linear-gradient(90deg,#2563eb,#14b8a6);color:white;border-radius:12px;padding:0.6rem 1.2rem;font-size:1.05rem;font-weight:600;border:none}
     div.stButton > button:hover{transform:scale(1.04);background:linear-gradient(90deg,#14b8a6,#2563eb)}
     audio{margin:10px auto;display:block}
 
-    /* Toolbar icons cyan */
-    .stCanvasToolbar button svg path { fill: cyan !important; stroke: cyan !important; }
-    .stCanvasToolbar button svg line { stroke: cyan !important; }
-    .stCanvasToolbar button svg polyline { stroke: cyan !important; }
-    .stCanvasToolbar button svg rect { stroke: cyan !important; fill: cyan !important; }
+    /* Toolbar icons white */
+    .stCanvasToolbar button svg path { fill: white !important; stroke: white !important; }
+    .stCanvasToolbar button svg line { stroke: white !important; }
+    .stCanvasToolbar button svg polyline { stroke: white !important; }
+    .stCanvasToolbar button svg rect { stroke: white !important; fill: white !important; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -104,7 +104,7 @@ st.markdown(
 st.markdown(
     """
     <h1>AI Doodle‑to‑Text</h1>
-    <p style='text-align:center;font-size:1.2rem;color:cyan;margin-bottom:30px;'>
+    <p style='text-align:center;font-size:1.2rem;color:white;margin-bottom:30px;'>
       Transform your drawings into simple descriptions and short stories
     </p>
     """,
@@ -122,7 +122,7 @@ st.sidebar.header("Output Language")
 language = st.sidebar.selectbox("Choose output language:", list(LANG_CODES.keys()))
 
 # Draw or Upload
-st.markdown("<h3 style='text-align:center;margin-top:20px;color:cyan;'>Draw a doodle or upload an image</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align:center;margin-top:20px;color:white;'>Draw a doodle or upload an image</h3>", unsafe_allow_html=True)
 
 col_r1, col_r2, col_r3 = st.columns([1, 2, 1])
 with col_r2:
@@ -171,7 +171,7 @@ else:
 # Generate Interpretation
 # ──────────────────────────────────────────────────────────────────────────────
 
-st.markdown("<h2 style='text-align:center;color:cyan;margin-top:40px;'>Generate Interpretation</h2>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align:center;color:white;margin-top:40px;'>Generate Interpretation</h2>", unsafe_allow_html=True)
 
 colA, colB, colC = st.columns([1, 2, 1])
 with colB:
@@ -204,5 +204,6 @@ if interpret:
                     st.error(f"TTS error: {e}")
         except Exception as e:
             st.error(f"Gemini error: {e}")
+
 
 
