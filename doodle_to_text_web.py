@@ -192,17 +192,17 @@ CANVAS_SIZE = 600
 
 if upload_option == "Draw on Canvas":
     
-        canvas_result = st_canvas(
-            fill_color="rgba(255, 255, 255, 1)",
-            stroke_width=stroke_width,
-            stroke_color=stroke_color,
-            background_color=bg_color,
-            width=CANVAS_SIZE,
-            height=CANVAS_SIZE,
-            drawing_mode="transform",
-            key="canvas",
-            update_streamlit=realtime_update,
-        )
+    canvas_result = st_canvas(
+        fill_color="rgba(255, 255, 255, 1)",
+        stroke_width=stroke_width,
+        stroke_color=stroke_color,
+        background_color=bg_color,
+        width=CANVAS_SIZE,
+        height=CANVAS_SIZE,
+        drawing_mode="transform",
+        key="canvas",
+        update_streamlit=realtime_update,
+    )
     if canvas_result.image_data is not None:
         fresh_img = Image.fromarray(canvas_result.image_data.astype("uint8")).convert("RGB")
         if not _is_blank(fresh_img, bg_color):
@@ -256,6 +256,7 @@ if interpret:
                     st.error(f"TTS error: {e}")
         except Exception as e:
             st.error(f"Gemini error: {e}")
+
 
 
 
