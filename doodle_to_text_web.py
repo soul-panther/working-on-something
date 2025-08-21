@@ -165,7 +165,11 @@ st.sidebar.header("Drawing Controls")
 stroke_width = st.sidebar.slider("Pen Size", 2, 25, 6)
 stroke_color = st.sidebar.color_picker("Pen Color", "#000000")
 bg_color = st.sidebar.color_picker("Background Color", "#FFFFFF")
-realtime_update = st.sidebar.checkbox("Update in realtime", True)
+realtime_update = st.sidebar.checkbox(
+    "Update in realtime", 
+    value=True, 
+    key="update_in_realtime"
+)
 
 st.sidebar.header("Output Language")
 language = st.sidebar.selectbox("Choose output language:", list(LANG_CODES.keys()))
@@ -253,5 +257,6 @@ if interpret:
                     st.error(f"TTS error: {e}")
         except Exception as e:
             st.error(f"Gemini error: {e}")
+
 
 
