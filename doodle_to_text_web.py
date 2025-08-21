@@ -69,7 +69,7 @@ st.markdown(
 st.markdown(
     """
     <h1>AI Doodle-to-Text</h1>
-    <p style='text-align:center; font-size:1.2rem; color:#e2e8f0; margin-bottom:30px;'>
+    <p style='text-align:center; font-size:1.2rem; color:#000000; margin-bottom:30px;'>
         Transform your drawings into simple descriptions and short stories
     </p>
     """,
