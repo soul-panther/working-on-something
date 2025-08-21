@@ -83,6 +83,7 @@ st.markdown(
     <style>
     [data-testid="stSidebar"] {
         background-color: #ADD8E6; /* Light blue color */
+        color: black;
     }
     [data-testid="stAppViewContainer"] {
         background-color: #00008B;  # Example: light blue
@@ -207,6 +208,7 @@ if interpret:
                     st.error(f"TTS error: {e}")
         except Exception as e:
             st.error(f"Gemini error: {e}")
+
 
 
 
