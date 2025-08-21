@@ -191,8 +191,7 @@ img = st.session_state.get("img")
 CANVAS_SIZE = 600
 
 if upload_option == "Draw on Canvas":
-    col1, col2, col3 = st.columns([1, 3, 1])
-    with col2:
+    
         canvas_result = st_canvas(
             fill_color="rgba(255, 255, 255, 1)",
             stroke_width=stroke_width,
@@ -257,6 +256,7 @@ if interpret:
                     st.error(f"TTS error: {e}")
         except Exception as e:
             st.error(f"Gemini error: {e}")
+
 
 
 
