@@ -81,6 +81,9 @@ st.set_page_config(page_title="AI Doodle‑to‑Text", page_icon="🖌️", layo
 st.markdown(
     """
     <style>
+    [data-testid="stAppViewContainer"] {
+        background-color: #ADD8E6;  # Example: light blue
+    }
     .block-container{max-width:900px;margin:auto;text-align:center}
     h1{color:cyan;font-size:2.8rem;margin-bottom:0.2rem}
     html,body,[class*="css"]{background:#fff;color:cyan}
@@ -201,3 +204,4 @@ if interpret:
                     st.error(f"TTS error: {e}")
         except Exception as e:
             st.error(f"Gemini error: {e}")
+
