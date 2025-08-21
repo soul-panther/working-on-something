@@ -140,6 +140,9 @@ st.markdown(
     div.stButton > button:hover{transform:scale(1.04);background:linear-gradient(90deg,#14b8a6,#2563eb)}
     audio{margin:10px auto;display:block}
 
+    .stCanvasToolbar {
+        background-color: #ADD8E6 !important;
+    }
     /* Toolbar icons white */
     .stCanvasToolbar button svg path { fill: white !important; stroke: white !important; }
     .stCanvasToolbar button svg line { stroke: white !important; }
@@ -257,6 +260,7 @@ if interpret:
                     st.error(f"TTS error: {e}")
         except Exception as e:
             st.error(f"Gemini error: {e}")
+
 
 
 
