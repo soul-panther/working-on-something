@@ -14,20 +14,12 @@ genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 # 🎨 Streamlit page setup
-st.set_page_config(page_title="AI Doodle-to-Text", page_icon="🎨", layout="wide")
+st.set_page_config(page_title="AI Doodle-to-Text", page_icon="🖌️", layout="wide")
 
-# 🌟 Custom CSS for centering + styling
+# 🌟 Custom CSS for centering + branding
 st.markdown(
     """
     <style>
-    .stCanvas {{
-        margin: auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: {CANVAS_SIZE}px !important;
-        height: {CANVAS_SIZE}px !important;
-    }}
     .block-container {
         max-width: 900px;
         margin: auto;
@@ -35,57 +27,61 @@ st.markdown(
     }
     h1 {
         text-align: center;
-        color: white !important;
-        font-size: 2.5rem;
-        margin-bottom: 0.5rem;
-    }
-    html, body, [class*="css"] {
-        color: white !important;
+        color: #ffffff !important;
+        font-size: 2.8rem;
+        margin-bottom: 0.2rem;
     }
     h2, h3, h4, .stMarkdown, .stSelectbox label, .stSlider label {
-        color: white !important;
+        color: #ffffff !important;
+    }
+    html, body, [class*="css"] {
+        color: #ffffff !important;
+        background-color: #0e1117;
     }
     div.stButton > button {
-        background: linear-gradient(90deg, #4A90E2, #50E3C2);
+        background: linear-gradient(90deg, #2563eb, #14b8a6);
         color: white;
         border-radius: 12px;
         padding: 0.6rem 1.2rem;
-        font-size: 1.1rem;
-        font-weight: bold;
+        font-size: 1.05rem;
+        font-weight: 600;
         border: none;
         cursor: pointer;
         transition: 0.3s;
     }
     div.stButton > button:hover {
-        transform: scale(1.05);
-        background: linear-gradient(90deg, #50E3C2, #4A90E2);
+        transform: scale(1.04);
+        background: linear-gradient(90deg, #14b8a6, #2563eb);
     }
     audio {
         margin: 10px auto;
         display: block;
-    }
-    button svg, .canvas-container svg {
-        filter: brightness(5) !important;
-        fill: white !important;
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# 🏷️ Title & description
-st.title("🎨 AI Doodle-to-Text for Children")
-st.write("✨ Draw or Upload → Gemini describes → Listen to the story aloud!")
+# 🏷️ Branding Header
+st.markdown(
+    """
+    <h1>AI Doodle-to-Text</h1>
+    <p style='text-align:center; font-size:1.2rem; color:#e2e8f0; margin-bottom:30px;'>
+        Transform your drawings into simple descriptions and short stories
+    </p>
+    """,
+    unsafe_allow_html=True,
+)
 
 # Sidebar controls
-st.sidebar.header("🖌️ Drawing Controls")
+st.sidebar.header("Drawing Controls")
 stroke_width = st.sidebar.slider("Pen Size", 2, 25, 6)
 stroke_color = st.sidebar.color_picker("Pen Color", "#000000")
 bg_color = st.sidebar.color_picker("Background Color", "#FFFFFF")
 realtime_update = st.sidebar.checkbox("Update in realtime", True)
 
 # Language selector
-st.sidebar.header("🌍 Output Language")
+st.sidebar.header("Output Language")
 language = st.sidebar.selectbox(
     "Choose output language:",
     ["English", "Hindi", "Spanish", "French", "German", "Chinese", "Japanese", "Arabic"],
@@ -104,11 +100,7 @@ lang_codes = {
 
 # ✏️ Option to Draw OR Upload
 st.markdown(
-    """
-    <div style="text-align:center; margin-top:20px;">
-        <h3>✏️ Draw Your Doodle or Upload an Image</h3>
-    </div>
-    """,
+    "<h3 style='text-align:center; margin-top:20px;'>Draw a doodle or upload an image</h3>",
     unsafe_allow_html=True,
 )
 
@@ -143,7 +135,7 @@ if upload_option == "Draw on Canvas":
         img = Image.fromarray(canvas_result.image_data.astype("uint8")).convert("RGB")
 
 else:  # Upload option
-    uploaded_file = st.file_uploader("📂 Upload a drawing (PNG, JPG, JPEG)", type=["png", "jpg", "jpeg"])
+    uploaded_file = st.file_uploader("Upload a drawing (PNG, JPG, JPEG)", type=["png", "jpg", "jpeg"])
     if uploaded_file is not None:
         img = Image.open(uploaded_file).convert("RGB")
         st.image(img, caption="Uploaded Image", use_container_width=True)
@@ -152,7 +144,7 @@ else:  # Upload option
 st.markdown(
     """
     <h2 style='text-align: center; color: white; margin-top: 40px;'>
-        🚀 Generate Interpretation
+        Generate Interpretation
     </h2>
     """,
     unsafe_allow_html=True,
@@ -161,7 +153,7 @@ st.markdown(
 # Center the button
 colA, colB, colC = st.columns([1, 2, 1])
 with colB:
-    interpret = st.button("✨ Interpret with Gemini", use_container_width=True)
+    interpret = st.button("Interpret with Gemini", use_container_width=True)
 
 # If button clicked
 if interpret:
@@ -172,9 +164,9 @@ if interpret:
         img_b64 = base64.b64encode(img_bytes).decode("utf-8")
 
         prompt = (
-            f"You are helping a dyslexic child. "
+            f"You are helping a child. "
             f"Look at the doodle and describe it simply in **{language}**. "
-            f"Then make a short cheerful story idea (1–2 sentences) also in **{language}**."
+            f"Then create a short cheerful story idea (1–2 sentences) also in **{language}**."
         )
 
         try:
@@ -186,11 +178,11 @@ if interpret:
             ])
             text_output = response.text.strip()
 
-            st.subheader(f"📝 Gemini’s Interpretation ({language})")
+            st.subheader(f"Gemini’s Interpretation ({language})")
             st.success(text_output)
 
             # 🔊 Text-to-Speech
-            st.subheader("🔊 Listen")
+            st.subheader("Listen")
             try:
                 tts = gTTS(text=text_output, lang=lang_codes.get(language, "en"))
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
@@ -203,5 +195,3 @@ if interpret:
             st.error(f"Gemini Error: {e}")
     else:
         st.warning("Please draw something or upload an image first!")
-
-
