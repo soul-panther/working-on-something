@@ -83,7 +83,7 @@ st.markdown(
     <style>
     /* Make sidebar text black */
     [data-testid="stSidebar"] * {
-        
+        background-color: white !important;
         color: black !important;
         fill: black !important;
         stroke: black !important;
@@ -94,7 +94,7 @@ st.markdown(
     [data-testid="stSidebar"] .stSelectbox label,
     [data-testid="stSidebar"] .stSelectbox span {
         color: black !important;
-        background: cyan !important;
+        background: black !important;
     }
     [data-testid="stSidebar"] .st-b9 {
         color: black !important;
@@ -104,7 +104,7 @@ st.markdown(
     [data-testid="stSidebar"] select, 
     [data-testid="stSidebar"] textarea {
         color: black !important;
-        background: cyan !important;
+        background: white !important;
     }
     [data-testid="stSidebar"] {
         background-color: #ADD8E6;
@@ -258,6 +258,7 @@ if interpret:
                     st.error(f"TTS error: {e}")
         except Exception as e:
             st.error(f"Gemini error: {e}")
+
 
 
 
