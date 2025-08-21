@@ -82,6 +82,27 @@ st.markdown(
     """
     <style>
     [data-testid="stSidebar"] {
+        background-color: #ADD8E6;
+        color: black !important;
+    }
+    [data-testid="stSidebar"] * {
+        color: black !important;
+        fill: black !important;
+        stroke: black !important;
+    }
+    [data-testid="stSidebar"] label, 
+    [data-testid="stSidebar"] h1, 
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3,
+    [data-testid="stSidebar"] h4,
+    [data-testid="stSidebar"] h5,
+    [data-testid="stSidebar"] h6,
+    [data-testid="stSidebar"] .stSlider label,
+    [data-testid="stSidebar"] .stCheckbox,
+    [data-testid="stSidebar"] .stSelectbox label {
+        color: black !important;
+    }
+    [data-testid="stSidebar"] {
         background-color: #ADD8E6; /* Light blue color */
         color: black;
     }
@@ -208,6 +229,7 @@ if interpret:
                     st.error(f"TTS error: {e}")
         except Exception as e:
             st.error(f"Gemini error: {e}")
+
 
 
 
