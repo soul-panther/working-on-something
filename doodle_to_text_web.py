@@ -81,6 +81,30 @@ st.set_page_config(page_title="AI Doodle‑to‑Text", page_icon="🖌️", layo
 st.markdown(
     """
     <style>
+    /* Make sidebar text black */
+    [data-testid="stSidebar"] * {
+        color: black !important;
+        fill: black !important;
+        stroke: black !important;
+    }
+    /* Make Streamlit selectbox readable */
+    [data-testid="stSidebar"] .stSelectbox, 
+    [data-testid="stSidebar"] .stSelectbox div, 
+    [data-testid="stSidebar"] .stSelectbox label,
+    [data-testid="stSidebar"] .stSelectbox span {
+        color: black !important;
+        background: white !important;
+    }
+    [data-testid="stSidebar"] .st-b9 {
+        color: black !important;
+        background: white !important;
+    }
+    [data-testid="stSidebar"] input, 
+    [data-testid="stSidebar"] select, 
+    [data-testid="stSidebar"] textarea {
+        color: black !important;
+        background: white !important;
+    }
     [data-testid="stSidebar"] {
         background-color: #ADD8E6;
         color: black !important;
@@ -229,6 +253,7 @@ if interpret:
                     st.error(f"TTS error: {e}")
         except Exception as e:
             st.error(f"Gemini error: {e}")
+
 
 
 
