@@ -117,7 +117,7 @@ st.markdown(
 
 # Sidebar controls
 st.sidebar.header("Drawing Controls")
-stroke_width = st.sidebar.slider("Pen Size", 2, 25, 6, "#000000")
+stroke_width = st.sidebar.slider("Pen Size", 2, 25, 6)
 stroke_color = st.sidebar.color_picker("Pen Color", "#000000")
 bg_color = st.sidebar.color_picker("Background Color", "#FFFFFF")
 realtime_update = st.sidebar.checkbox("Update in realtime", True)
@@ -208,6 +208,7 @@ if interpret:
                     st.error(f"TTS error: {e}")
         except Exception as e:
             st.error(f"Gemini error: {e}")
+
 
 
 
