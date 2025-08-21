@@ -200,7 +200,7 @@ if upload_option == "Draw on Canvas":
             background_color=bg_color,
             width=CANVAS_SIZE,
             height=CANVAS_SIZE,
-            drawing_mode="freedraw",
+            drawing_mode="transform",
             key="canvas",
             update_streamlit=realtime_update,
         )
@@ -257,6 +257,7 @@ if interpret:
                     st.error(f"TTS error: {e}")
         except Exception as e:
             st.error(f"Gemini error: {e}")
+
 
 
 
