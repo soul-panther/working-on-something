@@ -67,7 +67,7 @@ if not API_KEY:
 
 try:
     genai.configure(api_key=API_KEY)
-    MODEL_NAME = st.secrets.get("GEMINI_MODEL", "gemini-1.5-flash")  # type: ignore[attr-defined]
+    MODEL_NAME = st.secrets.get("GEMINI_MODEL", "gemini-2.5-flash")  # type: ignore[attr-defined]
 except Exception:
     MODEL_NAME = "gemini-1.5-flash"
 model = genai.GenerativeModel(MODEL_NAME)
@@ -260,6 +260,7 @@ if interpret:
                     st.error(f"TTS error: {e}")
         except Exception as e:
             st.error(f"Gemini error: {e}")
+
 
 
 
